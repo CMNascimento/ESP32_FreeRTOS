@@ -3,17 +3,20 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/semphr.h"
+#include "esp_heap_caps.h"
 
 static const char *TAG = "demo";
 
 BaseType_t xReturned1, xReturned2, xReturned3;
 TaskHandle_t Task1 = NULL, Task2 = NULL, Task3 = NULL;
 SemaphoreHandle_t xSemaphore;
-int gi_semaphoreTakeTask = 0; 
+uint8_t gi_semaphoreTakeTask = 0; 
 
 void task_1(void){
     ESP_LOGI(TAG, "TASK 1");
-
+    
+    ESP_LOGI(TAG, "RAM left %d", esp_get_free_heap_size());
+    
     vTaskDelay(2000 / portTICK_PERIOD_MS);
     
     vTaskDelete(Task1);
@@ -21,6 +24,8 @@ void task_1(void){
 
 void task_2(void){
     ESP_LOGI(TAG, "TASK 2");
+
+    ESP_LOGI(TAG, "RAM left %d", esp_get_free_heap_size());
 
     vTaskDelay(5000 / portTICK_PERIOD_MS);
     
@@ -30,6 +35,8 @@ void task_2(void){
 void task_3(void){
     ESP_LOGI(TAG, "TASK 3");
 
+    ESP_LOGI(TAG, "RAM left %d", esp_get_free_heap_size());
+    
     vTaskDelay(10000 / portTICK_PERIOD_MS);
 
     vTaskDelete(Task3);
@@ -42,7 +49,7 @@ void task_1_create(void){
 
         gi_semaphoreTakeTask = 1;
 
-        xReturned1 = xTaskCreate(task_1, "Task1", 4096, NULL, 5, &Task1);
+        xReturned1 = xTaskCreate(task_1, "Task1", 32768, NULL, 5, &Task1);
 
         if (xReturned1 == pdPASS)
         { 
@@ -65,7 +72,7 @@ void task_2_create(void){
 
         gi_semaphoreTakeTask = 2;
 
-        xReturned2 = xTaskCreate(task_2, "Task1", 4096, NULL, 5, &Task2);
+        xReturned2 = xTaskCreate(task_2, "Task1", 65536, NULL, 5, &Task2);
 
         if (xReturned2 == pdPASS)
         { 
@@ -88,7 +95,7 @@ void task_3_create(void){
 
         gi_semaphoreTakeTask = 3;
 
-        xReturned3 = xTaskCreate(task_3, "Task1", 4096, NULL, 5, &Task3);
+        xReturned3 = xTaskCreate(task_3, "Task1", 16384, NULL, 5, &Task3);
 
         if (xReturned3 == pdPASS)
         { 
@@ -116,6 +123,7 @@ void loop(void){
 void app_main(void)
 {
     ESP_LOGI(TAG, "Início do Exemplo");
+    ESP_LOGI(TAG, "RAM left %d", esp_get_free_heap_size());
 
     xSemaphore = xSemaphoreCreateBinary();
     if( xSemaphore != NULL ){
