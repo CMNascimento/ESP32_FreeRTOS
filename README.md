@@ -15,3 +15,5 @@ III) O semáforo é utilizado para gerenciar a criação das tarefas, não permi
 IV) Quando a função da criação da tarefa obtém a vez no semáforo, cria a tarefa e só libera a vez quando a tarefa criada é finalizada, alternado assim entras as criações das tarefas;
 
 V) As tarefas criadas possuem tamanhos diferentes, atrasos diferentes, verificam o último valor de memória RAM na pilha e salvam na pilha o atual valor.
+
+Versão do ESP-IDF: 4.4.2
